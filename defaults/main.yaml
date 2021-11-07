@@ -10,11 +10,15 @@ librenms:
   db_password: "secret_password"
   db_name: "librenms"
   db_user: "librenms"
+  memcache_container_image: "memcached"
+  memcache_container_tag: "1.6.12-bullseye"
+  memcached_size: 512
   redis_container_image: "redis"
   redis_container_tag: "5.0-alpine"
   # redis_container_tag: "6.2-bullseye"
   restart_policy: always
   state: started
+  sysctl_config: "etc/sysctl.d/librenms.conf"
   timezone: "Europe/Warsaw"
 
 # librenms_home: /srv/librenms
