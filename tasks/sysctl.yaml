@@ -1,0 +1,29 @@
+---
+
+- name: Setup vm.swappiness
+  ansible.posix.sysctl:
+    name: vm.swappiness
+    value: 0
+    state: present
+    sysctl_file: "/{{ librenms.sysctl_config }}"
+  tags:
+    - sysctl
+
+
+- name: Setup vm.overcommit_memory
+  ansible.posix.sysctl:
+    name: vm.overcommit_memory
+    value: 1
+    state: present
+    sysctl_file: "/{{ librenms.sysctl_config }}"
+  tags:
+    - sysctl
+
+- name: Setup vm.overcommit_memory
+  ansible.posix.sysctl:
+    name: vm.overcommit_ratio
+    value: 50
+    state: present
+    sysctl_file: "/{{ librenms.sysctl_config }}"
+  tags:
+    - sysctl
