@@ -1,0 +1,20 @@
+---
+
+- name: Pull a specific version of an image
+  containers.podman.podman_image:
+    name: "{{ librenms.redis_container_image }}"
+    tag: "{{ librenms.redis_container_tag }}"
+
+
+- name: Launch redis container
+  containers.podman.podman_container:
+    name: librenms_redis
+    image: "{{ librenms.redis_container_image }}:{{ librenms.redis_container_tag }}"
+    state: "{{ librenms.state }}"
+    restart_policy: always
+  environment:
+    TZ: "{{ librenms.timezone }}"
+    PATH: "/usr/sbin:{{ ansible_env['PATH'] }}"
+  tags:
+    - librenms
+    - librenms_redis

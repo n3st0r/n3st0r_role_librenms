@@ -1,0 +1,21 @@
+---
+
+librenms_prefix: "/srv/librenms"
+librenms:
+  db_volume: "{{ librenms_prefix }}/db"
+  db_config_volume: "{{ librenms_prefix }}/etc/mysql/conf.d"
+  db_container_image: "mariadb"
+  db_container_tag: "10.6.4"
+  db_root_password: "root_secret_password"
+  db_password: "secret_password"
+  db_name: "librenms"
+  db_user: "librenms"
+  redis_container_image: "redis"
+  redis_container_tag: "5.0-alpine"
+  # redis_container_tag: "6.2-bullseye"
+  restart_policy: always
+  state: started
+  timezone: "Europe/Warsaw"
+
+# librenms_home: /srv/librenms
+# librenms_user: librenms

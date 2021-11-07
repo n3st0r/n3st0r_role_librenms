@@ -1,0 +1,49 @@
+---
+
+- name: Prepare volumes for DB container
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: librenms
+    group: librenms
+  with_items:
+    - "{{ librenms.db_volume }}"
+    - "{{ librenms.db_config_volume }}"
+
+
+- name: Prepare or download db image
+  containers.podman.podman_image:
+    name: "{{ librenms.db_container_image }}:{{ librenms.db_container_tag }}"
+
+
+- name: Launch mariadb container
+  containers.podman.podman_container:
+    name: librenms_db
+    image: "{{ librenms.db_container_image }}:{{ librenms.db_container_tag }}"
+    state: "{{ librenms.state }}"
+    restart_policy: always
+    command:
+      - "mysqld"
+      - "--innodb-file-per-table=1"
+      - "--lower-case-table-names=0"
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_ci"
+    volumes:
+      - "{{ librenms.db_volume }}:/var/lib/mysql"
+      - "{{ librenms.db_config_volume }}:/etc/mysql/conf.d"
+    env:
+      MYSQL_ROOT_PASSWORD: "{{ librenms.db_root_password }}"
+      MYSQL_PASSWORD: "{{ librenms.db_password }}"
+      MYSQL_DATABASE: "{{ librenms.db_name }}"
+      MYSQL_USER: "{{ librenms.db_user }}"
+    exposed_ports:
+      - 3306
+    ports:
+      - "3306:3306"
+  environment:
+    PATH: "/usr/sbin:{{ ansible_env['PATH'] }}"
+  tags:
+    - librenms
+    - librenms_db
+
