@@ -10,9 +10,21 @@
     system: yes
 
 
+- name: Include roles for setting sysctl
+  import_tasks: sysctl.yaml
+
+
 - name: Include roles for DB in container
   import_tasks: db.yaml
 
 
-- name: Include roles for redis in the containers
+- name: Include roles for redis in the container
   import_tasks: svc_redis.yaml
+
+
+- name: Include roles for memcached in the container
+  import_tasks: svc_memcached.yaml
+
+
+- name: Include roles for rrdcached in the container
+  import_tasks: svc_rrdcached.yaml

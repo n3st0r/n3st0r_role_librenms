@@ -1,0 +1,38 @@
+---
+
+- name: Pull a specific version of rrdcached image
+  containers.podman.podman_image:
+    name: "{{ librenms.rrdcached_container_image }}"
+    tag: "{{ librenms.rrdcached_container_tag }}"
+  tags:
+    - librenms
+    - librenms_rrdcached
+
+
+- name: Launch rrdcached container
+  containers.podman.podman_container:
+    name: librenms_rrdcached
+    image: "{{ librenms.rrdcached_container_image }}:{{ librenms.rrdcached_container_tag }}"
+    log_level: info
+    log_opt: "path={{ librenms_prefix }}/log/rrdcached.log"
+    recreate: "{{ containers_recreate }}"
+    restart_policy: always
+    ports:
+      - 42217:42217
+    memory_swappiness: 0
+    state: "{{ librenms.state }}"
+    timezone: "{{ librenms.timezone }}"
+  environment:
+    TZ: "{{ librenms.timezone }}"
+    PATH: "/usr/sbin:{{ ansible_env['PATH'] }}"
+    MEMCACHED_CACHE_SIZE: "{{ librenms.memcached_size }}"
+    PUID: "{{ puid }}"
+    PGID: "{{ pgid }}"
+    LOG_LEVEL: LOG_INFO
+    WRITE_TIMEOUT: 1800
+    WRITE_JITTER: 1800
+    WRITE_THREADS: 4
+    FLUSH_DEAD_DATA_INTERVAL: 3600
+  tags:
+    - librenms
+    - librenms_rrdcached

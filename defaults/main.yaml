@@ -1,6 +1,9 @@
 ---
 
 librenms_prefix: "/srv/librenms"
+containers_recreate: no
+puid: 1000
+pgid: 1000
 librenms:
   db_volume: "{{ librenms_prefix }}/db"
   db_config_volume: "{{ librenms_prefix }}/etc/mysql/conf.d"
@@ -12,14 +15,16 @@ librenms:
   db_user: "librenms"
   memcache_container_image: "memcached"
   memcache_container_tag: "1.6.12-bullseye"
+  memcached_recreate: false
   memcached_size: 512
   redis_container_image: "redis"
   redis_container_tag: "5.0-alpine"
+  rrdcached_container_image: "crazymax/rrdcached"
+  rrdcached_container_tag: "latest"
+  rrdcached_volume: "{{ librenms_prefix }}/rrd/db"
+  rrdcached_config_volume: "{{ librenms_prefix }}/rrd/journal"
   # redis_container_tag: "6.2-bullseye"
   restart_policy: always
   state: started
   sysctl_config: "etc/sysctl.d/librenms.conf"
   timezone: "Europe/Warsaw"
-
-# librenms_home: /srv/librenms
-# librenms_user: librenms
