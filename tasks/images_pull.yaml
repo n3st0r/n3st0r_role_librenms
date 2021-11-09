@@ -1,0 +1,28 @@
+---
+
+- name: pull container images
+  containers.podman.podman_image:
+    name: "{{ item.name }}"
+    tag: "{{ item.version }}"
+  loop:
+    - name: "{{ librenms.redis_container_image }}"
+      version: "{{ librenms.redis_container_tag }}"
+      tag: librenms_redis
+    - name: "{{ librenms.memcached_container_image }}"
+      version: "{{ librenms.memcached_container_tag }}"
+      tag: librenms_memcached
+    - name: "{{ librenms.db_container_image }}"
+      version: "{{ librenms.db_container_tag }}"
+      tag: librenms_db
+    - name: "{{ librenms.rrdcached_container_image }}"
+      version: "{{ librenms.rrdcached_container_tag }}"
+      tag: librenms_rrdcached
+  when:
+    - ( ansible_run_tags == ['all'] and ansible_skip_tags == [])
+      or (ansible_run_tags == ['librenms'] and ansible_skip_tags == [])
+      or (ansible_run_tags == ['librenms_pull'])
+      or (item.tag in ansible_run_tags)
+      or (item.tag not in ansible_skip_tags and (item.tag in ansible_run_tags or ansible_run_tags == ['all']))
+  tags:
+    - always
+    - librenms_pull

@@ -10,6 +10,10 @@
     system: yes
 
 
+- name: Include roles for pulling images
+  import_tasks: images_pull.yaml
+
+
 - name: Include roles for setting sysctl
   import_tasks: sysctl.yaml
 
