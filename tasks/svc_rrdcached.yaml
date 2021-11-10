@@ -11,16 +11,24 @@
 
 - name: Launch rrdcached container
   containers.podman.podman_container:
-    name: librenms_rrdcached
+    name: "{{ librenms.rrdcached_container_name }}"
     image: "{{ librenms.rrdcached_container_image }}:{{ librenms.rrdcached_container_tag }}"
     log_level: info
     log_opt: "path={{ librenms_prefix }}/log/rrdcached.log"
     recreate: "{{ containers_recreate }}"
-    restart_policy: always
     ports:
       - 42217:42217
+    restart_policy: always
     memory_swappiness: 0
     state: "{{ librenms.state }}"
+    systemd: true
+    generate_systemd:
+      container_prefix: "box"
+      names: true
+      path: "/{{ librenms.systemd_prefix }}"
+      restart_policy: always
+      separator: "-"
+      time: 10
     timezone: "{{ librenms.timezone }}"
   environment:
     TZ: "{{ librenms.timezone }}"
@@ -33,6 +41,18 @@
     WRITE_JITTER: 1800
     WRITE_THREADS: 4
     FLUSH_DEAD_DATA_INTERVAL: 3600
+  notify:
+    - rrdcached_systemd
   tags:
     - librenms
     - librenms_rrdcached
+
+# - name: Enable systemd service
+#   systemd:
+#     name: "/{{ librenms.systemd_prefix }}/{{ librenms.rrdcached_systemd }}"
+#     daemon_reload: true
+#     enabled: yes
+#   when: rrdcached_container.changed
+#   tags:
+#     - librenms
+#     - librenms_rrdcached
