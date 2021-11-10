@@ -10,16 +10,14 @@
   with_items:
     - "{{ librenms.db_volume }}"
     - "{{ librenms.db_config_volume }}"
-
-
-- name: Prepare or download db image
-  containers.podman.podman_image:
-    name: "{{ librenms.db_container_image }}:{{ librenms.db_container_tag }}"
+  tags:
+    - librenms
+    - librenms_db
 
 
 - name: Launch mariadb container
   containers.podman.podman_container:
-    name: librenms_db
+    name: "{{ librenms.db_container_name }}"
     image: "{{ librenms.db_container_image }}:{{ librenms.db_container_tag }}"
     state: "{{ librenms.state }}"
     restart_policy: always
@@ -41,9 +39,21 @@
       - 3306
     ports:
       - "3306:3306"
+    systemd: true
+    generate_systemd:
+      container_prefix: "box"
+      names: true
+      path: "/{{ librenms.systemd_prefix }}"
+      restart_policy: always
+      separator: "-"
+      time: 10
+  notify:
+    - db_systemd
   environment:
     PATH: "/usr/sbin:{{ ansible_env['PATH'] }}"
+    # purge_networks: "yes"
+    # networks:
+    #   - name: "{{ librenms_network }}"
   tags:
     - librenms
     - librenms_db
-
