@@ -2,8 +2,8 @@
 
 - name: Pull a specific version of memcached image
   containers.podman.podman_image:
-    name: "{{ librenms.memcache_container_image }}"
-    tag: "{{ librenms.memcache_container_tag }}"
+    name: "{{ librenms.memcached_container_image }}"
+    tag: "{{ librenms.memcached_container_tag }}"
   tags:
     - librenms
     - librenms_memcached
@@ -12,13 +12,14 @@
 - name: Launch memcached container
   containers.podman.podman_container:
     name: librenms_memcached
-    image: "{{ librenms.memcache_container_image }}:{{ librenms.memcache_container_tag }}"
+    image: "{{ librenms.memcached_container_image }}:{{ librenms.memcached_container_tag }}"
     log_level: info
     log_opt: "path={{ librenms_prefix }}/log/memcached.log"
     healthcheck: "echo >/dev/tcp/127.0.0.1/11211; if [ $? -eq 0 ]; then echo 'Connection Successful'; fi"
     healthcheck_interval: "10s"
     healthcheck_retries: 4
     healthcheck_timeout: "1s"
+    recreate: "{{ containers_recreate }}"
     restart_policy: always
     ports:
       - 11211:11211/udp
