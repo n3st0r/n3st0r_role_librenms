@@ -12,15 +12,6 @@
     - librenms_redis
 
 
-- name: Pull a specific version of redis image
-  containers.podman.podman_image:
-    name: "{{ librenms.redis_container_image }}"
-    tag: "{{ librenms.redis_container_tag }}"
-  tags:
-    - librenms
-    - librenms_redis
-
-
 - name: Launch redis container
   containers.podman.podman_container:
     name: librenms_redis
@@ -34,7 +25,6 @@
     log_level: info
     log_opt: "path={{ librenms_prefix }}/log/redis.log"
     memory_swappiness: 0
-    # sysctl: vm.overcommit_memory=1
     timezone: "{{ librenms.timezone }}"
   environment:
     TZ: "{{ librenms.timezone }}"

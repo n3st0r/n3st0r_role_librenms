@@ -51,9 +51,6 @@
     - db_systemd
   environment:
     PATH: "/usr/sbin:{{ ansible_env['PATH'] }}"
-    # purge_networks: "yes"
-    # networks:
-    #   - name: "{{ librenms_network }}"
   tags:
     - librenms
     - librenms_db
