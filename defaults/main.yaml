@@ -18,18 +18,20 @@ librenms:
   db_user: "librenms"
   db_systemd: "box-librenms_db.service"
   memcached_container_image: "memcached"
+  memcached_container_name: "librenms_memcached"
   memcached_container_tag: "1.6.12-bullseye"
   memcached_recreate: false
   memcached_size: 512
+  memcached_systemd: "box-librenms_memcached.service"
   redis_container_image: "redis"
   redis_container_tag: "5.0-alpine"
+  # redis_container_tag: "6.2-bullseye"
   rrdcached_container_name: "librenms_rrdcached"
   rrdcached_container_image: "crazymax/rrdcached"
   rrdcached_container_tag: "latest"
   rrdcached_config_volume: "{{ librenms_prefix }}/rrd/journal"
   rrdcached_volume: "{{ librenms_prefix }}/rrd/db"
   rrdcached_systemd: "box-librenms_rrdcached.service"
-  # redis_container_tag: "6.2-bullseye"
   restart_policy: always
   state: started
   sysctl_config: "etc/sysctl.d/librenms.conf"

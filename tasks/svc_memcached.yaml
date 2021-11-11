@@ -39,6 +39,8 @@
     TZ: "{{ librenms.timezone }}"
     PATH: "/usr/sbin:{{ ansible_env['PATH'] }}"
     MEMCACHED_CACHE_SIZE: "{{ librenms.memcached_size }}"
+  notify:
+    - rrdcached_systemd
   tags:
     - librenms
     - librenms_memcached
