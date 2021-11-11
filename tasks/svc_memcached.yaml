@@ -11,7 +11,7 @@
 
 - name: Launch memcached container
   containers.podman.podman_container:
-    name: librenms_memcached
+    name: "{{ librenms.memcached_container_name }}"
     image: "{{ librenms.memcached_container_image }}:{{ librenms.memcached_container_tag }}"
     log_level: info
     log_opt: "path={{ librenms_prefix }}/log/memcached.log"
@@ -26,6 +26,14 @@
       - 11211:11211
     memory_swappiness: 0
     state: "{{ librenms.state }}"
+    systemd: true
+    generate_systemd:
+      container_prefix: "box"
+      names: true
+      path: "/{{ librenms.systemd_prefix }}"
+      restart_policy: always
+      separator: "-"
+      time: 10
     timezone: "{{ librenms.timezone }}"
   environment:
     TZ: "{{ librenms.timezone }}"
