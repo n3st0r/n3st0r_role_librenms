@@ -1,29 +1,17 @@
 ---
 
-- name: Prepare volumes for redis container
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    mode: '0755'
-  with_items:
-    - "{{ librenms_prefix }}/log"
-  tags:
-    - librenms
-    - librenms_redis
-
-
 - name: Launch redis container
   containers.podman.podman_container:
-    name: librenms_redis
+    name: "{{ librenms.redis_container_name }}"
     image: "{{ librenms.redis_container_image }}:{{ librenms.redis_container_tag }}"
     state: "{{ librenms.state }}"
-    restart_policy: always
+    restart_policy: "{{ librenms.restart_policy }}"
     healthcheck: "redis-cli ping"
     healthcheck_interval: "10s"
     healthcheck_retries: 5
     healthcheck_timeout: "2s"
-    log_level: info
-    log_opt: "path={{ librenms_prefix }}/log/redis.log"
+    log_level: "{{ librenms.log_level_redis }}"
+    log_opt: "path={{ librenms.log_dir }}/redis.log"
     memory_swappiness: 0
     timezone: "{{ librenms.timezone }}"
   environment:
