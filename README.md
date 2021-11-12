@@ -1,6 +1,19 @@
 # LibreNMS
 # --- WIP!!!! ---
-
+LibreNMS is a full-featured network monitoring system that provides a wealth of features and device support.
+Monitoring:
+* bandwidth
+* CPU load and usage
+* disk drives and used/free space
+* memory usage
+* uptime
+and much more.
+If you monitor your devices remotely, you will be notified if there is a problem by:
+* mail
+* signal
+* slack
+* telegram
+or many others.
 ## Dependencies
 This role assumes that `podman` is installed, configured and running on the system where LibreNMS will be installed.
 
