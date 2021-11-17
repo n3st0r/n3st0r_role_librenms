@@ -5,30 +5,68 @@
     name: librenms
     state: present
     comment: "LibreNMS User"
-    home: "{{ librenms_prefix }}"
+    createhome: no
+    # home: "{{ librenms_prefix }}"
     shell: /bin/bash
     system: yes
 
 
+- name: Create directories
+  ansible.builtin.file:
+    path: "/{{ item }}/"
+    state: directory
+    owner: librenms
+    group: librenms
+    mode: 0755
+  with_items:
+    - "{{ librenms_app_dir }}"
+    - "{{ librenms_svc_dir }}"
+    # - "{{ librenms.db_volume }}"
+    # - "{{ librenms.db_config_volume }}"
+    # - "{{ librenms.env_dir }}/"
+    # - "{{ librenms.log_dir }}/"
+    # - "{{ librenms.systemd_prefix }}/"
+  tags:
+    - always
+
+# - name: Prepare app env file
+#   ansible.builtin.template:
+#     src: "{{ item }}.j2"
+#     dest: "{{ librenms.env_dir }}/{{ item }}"
+#     mode: 0644
+#     backup: yes
+#     force: yes
+#   with_items:
+#     - "app.env"
+#     - "env"
+#     - "msmtpd.env"
+#   tags:
+#     - always
+
+
 - name: Include roles for pulling images
-  import_tasks: images_pull.yaml
+  import_tasks: pull_images.yaml
 
 
-- name: Include roles for setting sysctl
-  import_tasks: sysctl.yaml
+# - name: Include roles for setting sysctl
+#   import_tasks: sysctl.yaml
 
 
-- name: Include roles for DB in container
-  import_tasks: db.yaml
+# - name: Include roles for DB in container
+#   import_tasks: db.yaml
 
 
-- name: Include roles for redis in the container
-  import_tasks: svc_redis.yaml
+# - name: Include roles for redis in the container
+#   import_tasks: svc_redis.yaml
 
 
-- name: Include roles for memcached in the container
-  import_tasks: svc_memcached.yaml
+# - name: Include roles for memcached in the container
+#   import_tasks: svc_memcached.yaml
 
 
-- name: Include roles for rrdcached in the container
-  import_tasks: svc_rrdcached.yaml
+# - name: Include roles for rrdcached in the container
+#   import_tasks: svc_rrdcached.yaml
+
+
+# - name: Include roles for librenms app in the container
+#   import_tasks: librenms.yaml

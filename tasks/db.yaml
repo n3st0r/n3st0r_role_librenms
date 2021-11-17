@@ -1,56 +1,108 @@
 ---
 
-- name: Prepare volumes for DB container
+- name: Create directories
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "/{{ item }}/"
     state: directory
-    mode: '0755'
-    owner: librenms
-    group: librenms
+    owner: root
+    group: root
+    mode: 0755
   with_items:
-    - "{{ librenms.db_volume }}"
-    - "{{ librenms.db_config_volume }}"
+    - "{{ librenms_db_data_volume }}"
+    - "{{ librenms_db_etc_volume }}"
   tags:
     - librenms
-    - librenms_db
+    - librenms-db
 
 
 - name: Launch mariadb container
   containers.podman.podman_container:
-    name: "{{ librenms.db_container_name }}"
-    image: "{{ librenms.db_container_image }}:{{ librenms.db_container_tag }}"
-    state: "{{ librenms.state }}"
-    restart_policy: always
+    name: "{{ librenms_db_container_name }}"
+    image: "{{ librenms_db_container_image }}:{{ librenms_db_container_tag }}"
+    state: "{{ librenms_container_state }}"
+    restart_policy: "{{ librenms_container_restart_policy }}"
     command:
       - "mysqld"
       - "--innodb-file-per-table=1"
       - "--lower-case-table-names=0"
       - "--character-set-server=utf8mb4"
       - "--collation-server=utf8mb4_unicode_ci"
+      - "--default-authentication-plugin=mysql_native_password"
     volumes:
-      - "{{ librenms.db_volume }}:/var/lib/mysql"
-      - "{{ librenms.db_config_volume }}:/etc/mysql/conf.d"
+      - "{{ librenms_db_data_volume }}:/var/lib/mysql"
+      - "{{ librenms_db_etc_volume }}:/etc/mysql/conf.d"
     env:
-      MYSQL_ROOT_PASSWORD: "{{ librenms.db_root_password }}"
-      MYSQL_PASSWORD: "{{ librenms.db_password }}"
-      MYSQL_DATABASE: "{{ librenms.db_name }}"
-      MYSQL_USER: "{{ librenms.db_user }}"
+      MYSQL_ROOT_PASSWORD: "{{ librenms_db_root_password }}"
+      MYSQL_PASSWORD: "{{ librenms_db_password }}"
+      MYSQL_DATABASE: "{{ librenms_db_name }}"
+      MYSQL_USER: "{{ librenms_db_user }}"
     exposed_ports:
       - 3306
     ports:
       - "3306:3306"
     systemd: true
     generate_systemd:
-      container_prefix: "box"
+      container_prefix: "librenms"
       names: true
-      path: "/{{ librenms.systemd_prefix }}"
-      restart_policy: always
+      path: "/{{ librenms_systemd_dir }}"
+      restart_policy: "{{ librenms_container_restart_policy }}"
       separator: "-"
       time: 10
-  notify:
-    - db_systemd
   environment:
     PATH: "/usr/sbin:{{ ansible_env['PATH'] }}"
   tags:
     - librenms
-    - librenms_db
+    - librenms-db
+
+
+- name: Removes all anonymous user accounts
+  community.mysql.mysql_user:
+    name: ''
+    host_all: yes
+    state: absent
+    login_password: "{{ librenms_db_root_password }}"
+    login_user: "root"
+  retries: 12
+  delay: 5
+  register: result
+  until: result.failed == false
+  tags:
+    - librenms
+    - librenms-db
+
+
+- name: Create a new database with name {{ librenms_db_user }}
+  community.mysql.mysql_db:
+    name: librenms
+    state: present
+    collation: utf8mb4_unicode_ci
+    encoding: utf8mb4
+    login_password: "{{ librenms_db_root_password }}"
+    login_user: "root"
+  tags:
+    - librenms
+    - librenms-db
+
+
+- name: Add {{ librenms_db_user }} user in DB
+  community.mysql.mysql_user:
+    name: "{{ librenms_db_user }}"
+    host_all: yes
+    password: "{{ librenms_db_password }}"
+    login_password: "{{ librenms_db_root_password }}"
+    login_user: "root"
+    priv: "{{ librenms_db_name }}.*:ALL"
+    state: present
+  tags:
+    - librenms
+    - librenms-db
+
+# SET GLOBAL time_zone = 'Europe/Helsinki';
+- name: Set proper timezone in DB
+  community.mysql.mysql_query:
+    login_password: "{{ librenms_db_root_password }}"
+    login_user: "root"
+    query: SET GLOBAL time_zone = '{{ librenms_timezone }}';
+  tags:
+    - librenms
+    - librenms-db
