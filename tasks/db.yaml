@@ -50,6 +50,8 @@
       time: 10
   environment:
     PATH: "/usr/sbin:{{ ansible_env['PATH'] }}"
+  notify:
+    - restart_librenms_container
   tags:
     - librenms
     - librenms-db

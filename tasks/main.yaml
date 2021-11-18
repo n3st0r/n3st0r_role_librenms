@@ -45,15 +45,19 @@
 
 
 - name: Include roles for pulling images
-  import_tasks: pull_images.yaml
+  import_tasks: image_pull.yaml
 
 
 # - name: Include roles for setting sysctl
 #   import_tasks: sysctl.yaml
 
 
-# - name: Include roles for DB in container
-#   import_tasks: db.yaml
+- name: Include roles for DB in container
+  import_tasks: db.yaml
+
+
+# - name: Start installation of main application
+#   import_tasks: main_app.yaml
 
 
 # - name: Include roles for redis in the container

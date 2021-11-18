@@ -1,0 +1,43 @@
+---
+
+# - name: Enable systemd service for "{{ librenms.db_container_name }}"
+#   ansible.builtin.systemd:
+#     name: "/{{ librenms.systemd_prefix }}/{{ librenms.db_systemd }}"
+#     daemon_reload: true
+#     enabled: yes
+#   listen: db_systemd
+
+- name: Restart systemd service "{{ librenms_db_container_name }}"
+  ansible.builtin.systemd:
+    name: "{{ librenms_db_systemd }}"
+    state: restarted
+    daemon_reload: true
+    enabled: yes
+  listen:
+    - restart_librenms_container
+
+# - name: Enable systemd service for "{{ librenms.rrdcached_container_name }}"
+#   ansible.builtin.systemd:
+#     name: "/{{ librenms.systemd_prefix }}/{{ librenms.rrdcached_systemd }}"
+#     daemon_reload: true
+#     enabled: yes
+#   listen: rrdcached_systemd
+
+# - name: Enable systemd service "{{ librenms.rrdcached_container_name }}"
+#   ansible.builtin.systemd:
+#     name: "{{ librenms.rrdcached_systemd }}"
+#     state: restarted
+#   listen: rrdcached_systemd
+
+# - name: Enable systemd service for "{{ librenms.memcached_container_name }}"
+#   ansible.builtin.systemd:
+#     name: "/{{ librenms.systemd_prefix }}/{{ librenms.memcached_systemd }}"
+#     daemon_reload: true
+#     enabled: yes
+#   listen: rrdcached_systemd
+
+# - name: Enable systemd service "{{ librenms.memcached_container_name }}"
+#   ansible.builtin.systemd:
+#     name: "{{ librenms.memcached_systemd }}"
+#     state: restarted
+#   listen: rrdcached_systemd

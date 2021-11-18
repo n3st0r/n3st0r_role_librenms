@@ -3,22 +3,24 @@
 librenms_app_dir: "/opt/librenms"
 librenms_svc_dir: "/srv/librenms"
 librenms_containers_recreate: no
-
+librenms_container_state: started
+librenms_container_restart_policy: always
 librenms_sysctl_config: "etc/sysctl.d/librenms.conf"
-librenms_systemd_prefix: "etc/systemd/"
+librenms_systemd_dir: "etc/systemd/system"
 librenms_timezone: "Europe/Warsaw"
 
 # DB
-librenms_db_volume: "{{ librenms_svc_dir }}/db"
-librenms_db_config_volume: "{{ librenms_svc_dir }}/etc/mysql/conf.d"
-librenms_db_container_name: "librenms_db"
+librenms_db_data_volume: "{{ librenms_svc_dir }}/db"
+librenms_db_etc_volume: "{{ librenms_svc_dir }}/etc/mysql/conf.d"
+librenms_db_container_name: "db"
 librenms_db_container_image: "mariadb"
 librenms_db_container_tag: "10.6.4"
 librenms_db_root_password: "root_secret_password"
 librenms_db_password: "secret_password"
 librenms_db_name: "librenms"
 librenms_db_user: "librenms"
-librenms_db_systemd: "librenms_db.service"
+librenms_db_systemd: "librenms-db.service"
+
 
 # librenms_user: 1000
 # librenms_pgid: 1000
