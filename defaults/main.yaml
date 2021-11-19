@@ -2,12 +2,11 @@
 
 librenms_app_dir: "/opt/librenms"
 librenms_svc_dir: "/srv/librenms"
+librenms_user: "librenms"
+librenms_group: "librenms"
 librenms_containers_recreate: no
 librenms_container_state: started
 librenms_container_restart_policy: always
-librenms_sysctl_config: "etc/sysctl.d/librenms.conf"
-librenms_systemd_dir: "etc/systemd/system"
-librenms_timezone: "Europe/Warsaw"
 
 # DB
 librenms_db_data_volume: "{{ librenms_svc_dir }}/db"
@@ -21,6 +20,11 @@ librenms_db_name: "librenms"
 librenms_db_user: "librenms"
 librenms_db_systemd: "librenms-db.service"
 
+librenms_php_fpm_socket: "/run/php-fpm-librenms.sock"
+
+librenms_sysctl_config: "etc/sysctl.d/librenms.conf"
+librenms_systemd_dir: "etc/systemd/system"
+librenms_timezone: "Europe/Warsaw"
 
 # librenms_user: 1000
 # librenms_pgid: 1000
@@ -62,3 +66,47 @@ librenms_db_systemd: "librenms-db.service"
 #   tags:
 #     - librenms
 #     - librenms_redis
+
+
+librenms_packages_deb:
+  - acl
+  - curl
+  - composer
+  - fping
+  - git
+  - graphviz
+  - imagemagick
+  - mariadb-client
+  - mtr-tiny
+  # - nginx-full
+  - nmap
+  - php7.4-cli
+  - php7.4-curl
+  - php7.4-fpm
+  - php7.4-gd
+  - php7.4-gmp
+  - php7.4-json
+  - php7.4-mbstring
+  - php7.4-mysql
+  - php7.4-snmp
+  - php7.4-xml
+  - php7.4-zip
+  - python3-dotenv
+  - python3-pip
+  - python3-psutil
+  - python3-pymysql
+  - python3-redis
+  - python3-setuptools
+  - python3-systemd
+  - rrdtool
+  - snmp
+  - snmpd
+  - whois
+
+librenms_packages_python:
+  - command_runner
+  - PyMySQL!=1.0.0
+  - python-dotenv
+  - redis>=3.0
+  - setuptools
+  - psutil>=5.6.0

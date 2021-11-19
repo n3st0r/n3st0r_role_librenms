@@ -1,0 +1,22 @@
+---
+
+- name: Install required system packages in system
+  ansible.builtin.apt:
+    name: "{{ librenms_packages_deb }}"
+    state: present
+  become: yes
+  tags:
+    - librenms
+    - librenms-packages
+
+
+- name: Install required python3 modules in user home
+  ansible.builtin.pip:
+    name: "{{ librenms_packages_python }}"
+    state: present
+    extra_args: --user
+  become: yes
+  become_user: librenms
+  tags:
+    - librenms
+    - librenms-packages

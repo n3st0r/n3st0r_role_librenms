@@ -56,8 +56,11 @@
   import_tasks: db.yaml
 
 
-# - name: Start installation of main application
-#   import_tasks: main_app.yaml
+- name: Start installation of main application
+  import_tasks: main_app.yaml
+
+- name: Ensure that the main requirements are installed
+  import_tasks: packages.yaml
 
 
 # - name: Include roles for redis in the container

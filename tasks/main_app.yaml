@@ -1,0 +1,109 @@
+---
+
+- name: Clone/update repo from GitHub
+  ansible.builtin.git:
+    repo: "https://github.com/librenms/librenms.git"
+    dest: "{{ librenms_app_dir }}/"
+    update: yes
+    force: yes
+    version: master
+  become: yes
+  become_user: "{{ librenms_user }}"
+  environment:
+    TZ: "{{ librenms_timezone }}"
+  # notify:
+  #   - restart fpm
+  tags:
+    - librenms
+    - librenms-app
+
+
+- name: Fix homedir for user "{{ librenms_user }}"
+  ansible.builtin.user:
+    name: "{{ librenms_user }}"
+    state: present
+    home: "{{ librenms_app_dir }}"
+  tags:
+    - librenms
+    - librenms-app
+
+- name: Setup right owner and group
+  ansible.builtin.file:
+    path: "{{ librenms_app_dir }}/"
+    owner: "{{ librenms_user }}"
+    group: "{{ librenms_group }}"
+    recurse: yes
+  tags:
+    - librenms-app
+
+- name: Setup right permision only for {{ librenms_app_dir }}
+  ansible.builtin.file:
+    path: "{{ librenms_app_dir }}"
+    owner: "{{ librenms_user }}"
+    group: "{{ librenms_group }}"
+    recurse: no
+    mode: 0771
+  tags:
+    - librenms-app
+
+- name: Grant right permissions
+  ansible.posix.acl:
+    default: yes
+    entity: "{{ librenms_group }}"
+    etype: group
+    path: "{{ librenms_app_dir }}/{{ item }}"
+    permissions: rwx
+    recursive: yes
+    state: present
+  changed_when: false
+  with_items:
+    - rrd
+    - logs
+    - bootstrap/cache
+    - storage
+  when: item is defined
+  tags:
+    - librenms-app
+
+
+- name: Install PHP dependencies
+  ansible.builtin.command:
+    cmd: ./scripts/composer_wrapper.php install --no-dev
+  become: yes
+  become_user: "{{ librenms_user }}"
+  args:
+    chdir: "{{ librenms_app_dir }}"
+    creates: "{{ librenms_app_dir }}/composer.phar"
+  environment:
+    TZ: "{{ librenms_timezone }}"
+  notify:
+    - restart_librenms_fpm
+  tags:
+    - librenms-app
+
+
+- name: set php timezone
+  ansible.builtin.lineinfile:
+    path: "{{ item }}"
+    regexp: ';?date.timezone\s*='
+    line: "date.timezone = {{ librenms_timezone }}"
+  with_items:
+    - /etc/php/7.4/fpm/php.ini
+    - /etc/php/7.4/cli/php.ini
+  when: item is defined
+  notify:
+    - restart_librenms_fpm
+  tags:
+    - librenms-app
+
+
+- name: Prepare configuration for librenms fpm
+  ansible.builtin.template:
+    src: "etc/php/7.4/fpm/pool.d/librenms.conf.j2"
+    dest: "/etc/php/7.4/fpm/pool.d/librenms.conf"
+    mode: 0640
+  notify:
+    - restart_librenms_fpm
+  tags:
+    - librenms-app
+    - librenms-fpm
