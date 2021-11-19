@@ -46,13 +46,3 @@
   tags:
     - librenms
     - librenms_rrdcached
-
-# - name: Enable systemd service
-#   systemd:
-#     name: "/{{ librenms.systemd_prefix }}/{{ librenms.rrdcached_systemd }}"
-#     daemon_reload: true
-#     enabled: yes
-#   when: rrdcached_container.changed
-#   tags:
-#     - librenms
-#     - librenms_rrdcached

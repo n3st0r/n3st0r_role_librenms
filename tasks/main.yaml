@@ -2,27 +2,29 @@
 
 - name: Create user librenms
   ansible.builtin.user:
-    name: librenms
+    name: "{{ librenms_user }}"
     state: present
     comment: "LibreNMS User"
     createhome: no
     # home: "{{ librenms_prefix }}"
     shell: /bin/bash
     system: yes
-
+  become: yes
+  tags:
+    - always
 
 - name: Create directories
   ansible.builtin.file:
     path: "/{{ item }}/"
     state: directory
-    owner: librenms
-    group: librenms
-    mode: 0755
+    owner: "{{ librenms_user }}"
+    group: "{{ librenms_group }}"
+    recurse: no
+    mode: 0771
+  become: yes
   with_items:
     - "{{ librenms_app_dir }}"
     - "{{ librenms_svc_dir }}"
-    # - "{{ librenms.db_volume }}"
-    # - "{{ librenms.db_config_volume }}"
     # - "{{ librenms.env_dir }}/"
     # - "{{ librenms.log_dir }}/"
     # - "{{ librenms.systemd_prefix }}/"

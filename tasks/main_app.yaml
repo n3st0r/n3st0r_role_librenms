@@ -1,5 +1,13 @@
 ---
 
+- name: Set timezone to {{ librenms_timezone }}
+  timezone:
+    name: "{{ librenms_timezone }}"
+    hwclock: UTC
+  tags:
+    - librenms-app
+
+
 - name: Clone/update repo from GitHub
   ansible.builtin.git:
     repo: "https://github.com/librenms/librenms.git"
@@ -9,12 +17,9 @@
     version: master
   become: yes
   become_user: "{{ librenms_user }}"
-  environment:
-    TZ: "{{ librenms_timezone }}"
-  # notify:
-  #   - restart fpm
+  notify:
+    - restart_librenms_fpm
   tags:
-    - librenms
     - librenms-app
 
 
@@ -24,8 +29,9 @@
     state: present
     home: "{{ librenms_app_dir }}"
   tags:
-    - librenms
+    - librenms_user
     - librenms-app
+
 
 - name: Setup right owner and group
   ansible.builtin.file:
@@ -36,6 +42,7 @@
   tags:
     - librenms-app
 
+
 - name: Setup right permision only for {{ librenms_app_dir }}
   ansible.builtin.file:
     path: "{{ librenms_app_dir }}"
@@ -45,6 +52,7 @@
     mode: 0771
   tags:
     - librenms-app
+
 
 - name: Grant right permissions
   ansible.posix.acl:
@@ -95,6 +103,19 @@
     - restart_librenms_fpm
   tags:
     - librenms-app
+    - librenms-fpm
+
+
+- name: Ensure default config file for php-fpm
+  ansible.builtin.file:
+    path: "/etc/php/7.4/fpm/pool.d/www.conf"
+    state: absent
+  become: yes
+  notify:
+    - restart_librenms_fpm
+  tags:
+    - librenms-app
+    - librenms-fpm
 
 
 - name: Prepare configuration for librenms fpm
