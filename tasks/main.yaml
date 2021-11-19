@@ -6,12 +6,12 @@
     state: present
     comment: "LibreNMS User"
     createhome: no
-    # home: "{{ librenms_prefix }}"
     shell: /bin/bash
     system: yes
   become: yes
   tags:
     - always
+
 
 - name: Create directories
   ansible.builtin.file:
@@ -25,33 +25,16 @@
   with_items:
     - "{{ librenms_app_dir }}"
     - "{{ librenms_svc_dir }}"
-    # - "{{ librenms.env_dir }}/"
-    # - "{{ librenms.log_dir }}/"
-    # - "{{ librenms.systemd_prefix }}/"
   tags:
     - always
 
-# - name: Prepare app env file
-#   ansible.builtin.template:
-#     src: "{{ item }}.j2"
-#     dest: "{{ librenms.env_dir }}/{{ item }}"
-#     mode: 0644
-#     backup: yes
-#     force: yes
-#   with_items:
-#     - "app.env"
-#     - "env"
-#     - "msmtpd.env"
-#   tags:
-#     - always
+
+- name: Include roles for setting sysctl
+  import_tasks: sysctl.yaml
 
 
 - name: Include roles for pulling images
   import_tasks: image_pull.yaml
-
-
-# - name: Include roles for setting sysctl
-#   import_tasks: sysctl.yaml
 
 
 - name: Include roles for DB in container

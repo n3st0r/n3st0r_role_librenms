@@ -5,9 +5,9 @@
     name: vm.swappiness
     value: 0
     state: present
-    sysctl_file: "/{{ librenms.sysctl_config }}"
+    sysctl_file: "/{{ librenms_sysctl_config }}"
   tags:
-    - sysctl
+    - librenms_sysctl
 
 
 - name: Setup vm.overcommit_memory
@@ -15,15 +15,24 @@
     name: vm.overcommit_memory
     value: 1
     state: present
-    sysctl_file: "/{{ librenms.sysctl_config }}"
+    sysctl_file: "/{{ librenms_sysctl_config }}"
   tags:
-    - sysctl
+    - librenms_sysctl
 
 - name: Setup vm.overcommit_memory
   ansible.posix.sysctl:
     name: vm.overcommit_ratio
     value: 50
     state: present
-    sysctl_file: "/{{ librenms.sysctl_config }}"
+    sysctl_file: "/{{ librenms_sysctl_config }}"
   tags:
-    - sysctl
+    - librenms_sysctl
+
+- name: Add unprivileged port 80 to the list of allowed ports
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_unprivileged_port_start
+    value: 80
+    state: present
+    sysctl_file: "/{{ librenms_sysctl_config }}"
+  tags:
+    - librenms_sysctl
